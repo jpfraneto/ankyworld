@@ -1,0 +1,21 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://doadmin:AVNS_gs1f98mAh2oe6BN6KTH@jpanky-do-user-13919839-0.b.db.ondigitalocean.com:25060/defaultdb?sslmode=require"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model NFT {
+  id        Int      @id @default(autoincrement())
+  prompt    String
+  imageUrl  String
+  createdAt DateTime @default(now())
+}
+
+model Tester {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  text      String?
+}
