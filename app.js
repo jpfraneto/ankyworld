@@ -17,34 +17,148 @@ const configuration = new Configuration({
   apiKey: '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',
 });
 
+const traits = {
+  physique: [
+    'muscular',
+    'slim',
+    'chubby',
+    'tall',
+    'short',
+    'long',
+    'amorphous',
+    'tentacled',
+  ],
+  movement: [
+    'walk',
+    'run',
+    'slither',
+    'hop',
+    'float',
+    'roll',
+    'crawl',
+    'teleport',
+  ],
+  element: [
+    'earth',
+    'fire',
+    'water',
+    'air',
+    'light',
+    'darkness',
+    'time',
+    'space',
+  ],
+  personality: [
+    'joyful',
+    'sad',
+    'angry',
+    'surprised',
+    'fearful',
+    'disgusted',
+    'calm',
+    'confused',
+  ],
+  accessory: [
+    'sword',
+    'shield',
+    'wand',
+    'bow and arrow',
+    'staff',
+    'dagger',
+    'hammer',
+    'book of spells',
+  ],
+  companion: [
+    'wolf',
+    'eagle',
+    'snake',
+    'rabbit',
+    'owl',
+    'mouse',
+    'turtle',
+    'cat',
+  ],
+  materialComposition: [
+    'gold',
+    'wood',
+    'glass',
+    'stone',
+    'metal',
+    'crystal',
+    'cloud',
+    'light',
+  ],
+  specialAbility: [
+    'fly',
+    'communicate telepathically',
+    'become invisible',
+    'travel through time',
+    'shift shapes',
+    'heal',
+    'move objects with their mind',
+    'move at super speed',
+  ],
+};
+
+// Function to generate a random prompt
+function generateRandomPrompt() {
+  const physique =
+    traits.physique[Math.floor(Math.random() * traits.physique.length)];
+  const movement =
+    traits.movement[Math.floor(Math.random() * traits.movement.length)];
+  const element =
+    traits.element[Math.floor(Math.random() * traits.element.length)];
+  const personality =
+    traits.personality[Math.floor(Math.random() * traits.personality.length)];
+  const accessory =
+    traits.accessory[Math.floor(Math.random() * traits.accessory.length)];
+  const companion =
+    traits.companion[Math.floor(Math.random() * traits.companion.length)];
+  const materialComposition =
+    traits.materialComposition[
+      Math.floor(Math.random() * traits.materialComposition.length)
+    ];
+  const specialAbility =
+    traits.specialAbility[
+      Math.floor(Math.random() * traits.specialAbility.length)
+    ];
+
+  const prompt = `https://s.mj.run/YLJMlMJbo70 The profile picture of a cartoon. Its physique is ${physique}. It moves primarily by ${movement}. It's tied to the ${element} element. The character exudes a ${personality} personality. A notable accessory is their ${accessory}. Accompanying them is a ${companion}. Their body appears to be made of ${materialComposition}. Their special ability is to ${specialAbility}.`;
+
+  return prompt;
+}
+
+console.log(generateRandomPrompt());
+
 const openai = new OpenAIApi(configuration);
 
 const createNFT = async () => {
   console.log('inside the createNFT function');
   try {
-    const messages = [
-      {
-        role: 'system',
-        content: `You are in charge of writing the description of a random character in a fictional world filled with wonder and awe. This is going to be the world in which children will be educated in the coming years, using fun as the vehicle for the deeper experience of life. Please make the description no more than 333 characters.`,
-      },
-      { role: 'user', content: 'Create a character' },
-    ];
+    // const messages = [
+    //   {
+    //     role: 'system',
+    //     content: `You are in charge of writing the description of a random character in a fictional world filled with wonder and awe. This is going to be the world in which children will be educated in the coming years, using fun as the vehicle for the deeper experience of life. Please make the description no more than 333 characters.`,
+    //   },
+    //   { role: 'user', content: 'Create a character' },
+    // ];
 
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
-      messages: messages,
-    });
+    // const completion = await openai.createChatCompletion({
+    //   model: 'gpt-3.5-turbo',
+    //   messages: messages,
+    // });
 
-    console.log(
-      'the completion answer is: ',
-      completion.data.choices[0].message.content
-    );
+    // console.log(
+    //   'the completion answer is: ',
+    //   completion.data.choices[0].message.content
+    // );
 
     const imageUrl =
       'https://media.discordapp.net/attachments/1054830741042774016/1115644141049745428/kithkui_The_profile_picture_of_a_cartoon._Meet_Zephyr_a_mischie_694fa1e7-d47a-49df-be9e-19b79079759c.png';
+    const randomPrompt = generateRandomPrompt();
     const newNFT = await prisma.nFT.create({
       data: {
-        prompt: completion.data.choices[0].message.content,
+        prompt: randomPrompt,
         imageUrl: imageUrl,
       },
     });
