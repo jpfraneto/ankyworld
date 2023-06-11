@@ -125,7 +125,7 @@ const intervalID = setInterval(async () => {
   } catch (error) {
     console.log('There was an error inside the setInterval', error);
   }
-}, 20000);
+}, 33333);
 
 async function createNewNft() {
   const character = newGenerateCharacter();
