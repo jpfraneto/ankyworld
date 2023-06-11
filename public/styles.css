@@ -1,0 +1,30 @@
+/* styles.css */
+.image-selector {
+  display: flex;
+  flex-wrap: wrap;
+}
+.image-selector img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  margin: 10px;
+  cursor: pointer;
+  border: 5px solid transparent;
+}
+.image-selector img.selected {
+  border-color: green;
+}
+
+.main-character-container {
+  display: flex;
+  margin-top: 10px;
+}
+
+.main-character-container > * {
+  width: 50%;
+}
+
+.text-container > * {
+  width: 100%;
+  height: 30px;
+}

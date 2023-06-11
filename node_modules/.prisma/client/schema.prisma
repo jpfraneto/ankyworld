@@ -1,10 +1,10 @@
-datasource db {
-  provider = "postgresql"
-  url      = "postgresql://doadmin:AVNS_gs1f98mAh2oe6BN6KTH@jpanky-do-user-13919839-0.b.db.ondigitalocean.com:25060/defaultdb?sslmode=require"
-}
-
 generator client {
   provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
 }
 
 model NFT {
@@ -18,4 +18,32 @@ model Tester {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   text      String?
+}
+
+model World {
+  id                String     @id @default(cuid())
+  name              String
+  chakra            Int
+  otherside         String
+  description       String
+  characteristics   String
+  characters        Character[]
+}
+
+model Character {
+  id                   String   @id @default(cuid())
+  preliminaryDescription  String
+  chakraDescription      String
+  animalOrGodString      String?
+  worldId                String
+  world                  World    @relation(fields: [worldId], references: [id])
+  promptForMidjourney    String
+  characterName          String
+  characterBackstory     String
+  imageId                String?
+  imageUrl               String?
+  upscaledImageUrls      String[] // store as JSON string
+  chosenImageUrl         String?
+  readyToMint            Boolean  @default(false)
+  completionResponse     String?
 }
