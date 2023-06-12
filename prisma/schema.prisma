@@ -33,7 +33,7 @@ model World {
 model Character {
   id                   String   @id @default(cuid())
   createdAt              DateTime            @default(now())
-  updatedAt              DateTime            @updatedAt
+  updatedAt              DateTime            @updatedAt  @default(now())
   preliminaryDescription  String
   chakraDescription      String
   animalOrGodString      String?
