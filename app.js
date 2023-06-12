@@ -178,7 +178,8 @@ async function createNewNft() {
     );
 
     const dataResponse = completion.data.choices[0].message.content;
-    const dataCharacter = extractCharacter(dataResponse.trim());
+    const jsonString = dataResponse.trim().match(/{.*}/)[0];
+    const dataCharacter = JSON.parse(jsonString);
 
     console.log('OUT HERE. ', dataCharacter, character);
 
