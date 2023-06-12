@@ -129,10 +129,10 @@ const intervalID = setInterval(async () => {
 
 async function createNewNft() {
   const character = newGenerateCharacter();
-  console.log(
-    'inside the createNewNft function, the character is: ',
-    character
-  );
+  // console.log(
+  //   'inside the createNewNft function, the character is: ',
+  //   character
+  // );
   try {
     const messages = [
       {
@@ -178,7 +178,7 @@ async function createNewNft() {
     );
 
     const dataResponse = completion.data.choices[0].message.content;
-    const dataCharacter = JSON.parse(dataResponse.trim());
+    const dataCharacter = extractCharacter(dataResponse.trim());
 
     console.log('OUT HERE. ', dataCharacter, character);
 
