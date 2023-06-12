@@ -146,7 +146,7 @@ async function createNewNft() {
         {"characterName":"Give a unique name for the character, in a language that you come up with.",
         "characterBackstory":"Write a biography of the character that is less than 4 paragraphs long."}
 
-        The JSON object:`,
+        The JSON object, correctly formatted is:`,
       },
       {
         role: 'user',
@@ -178,10 +178,22 @@ async function createNewNft() {
     );
 
     const dataResponse = completion.data.choices[0].message.content;
-    const jsonString = dataResponse.trim().match(/{.*}/)[0];
-    const dataCharacter = JSON.parse(jsonString);
 
-    console.log('OUT HERE. ', dataCharacter, character);
+    const nameRegex = /"characterName"\s*:\s*"([\s\S]*?)"/;
+    const backstoryRegex = /"characterBackstory"\s*:\s*"([\s\S]*?)"/;
+
+    const nameMatch = dataResponse.match(nameRegex);
+    const backstoryMatch = dataResponse.match(backstoryRegex);
+
+    let characterName, characterBackstory;
+
+    if (nameMatch !== null && nameMatch.length > 1) {
+      characterName = nameMatch[1];
+    }
+
+    if (backstoryMatch !== null && backstoryMatch.length > 1) {
+      characterBackstory = backstoryMatch[1];
+    }
 
     // const config = {
     //   headers: { Authorization: `Bearer ${process.env.IMAGINE_API_KEY}` },
@@ -203,8 +215,6 @@ async function createNewNft() {
       where: { chakra: character.world.chakra },
     });
 
-    console.log('the world is:', world);
-
     // // Create new character in database
     let newCharacter = await prisma.character.create({
       data: {
@@ -213,8 +223,8 @@ async function createNewNft() {
         chakraDescription: character.chakraDescription,
         animalOrGodString: character.animalOrGodString,
         promptForMidjourney: character.promptForMidjourney,
-        characterName: dataCharacter.characterName,
-        characterBackstory: dataCharacter.characterBackstory,
+        characterName: characterName || '',
+        characterBackstory: characterBackstory || '',
         world: {
           connect: {
             id: world.id,
@@ -224,7 +234,8 @@ async function createNewNft() {
     });
 
     console.log(
-      'Inside the function, the new character was generated in the db'
+      'Inside the function, the new character was generated in the db',
+      newCharacter
     );
 
     return newCharacter;
