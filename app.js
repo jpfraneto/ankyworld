@@ -246,6 +246,7 @@ async function createNewNft() {
     // };
   } catch (error) {
     console.log('there was an error creating the character', error);
+    console.log('HEREEEEE', error.response.data);
   }
 }
 
