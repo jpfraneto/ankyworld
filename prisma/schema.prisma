@@ -20,32 +20,67 @@ model Tester {
   text      String?
 }
 
+model City {
+  id                 String    @id @default(cuid())
+  name               String
+  associatedLandmark String
+  mainActivity       String
+  worldId            String
+  world              World     @relation(fields: [worldId], references: [id])
+}
+
+model Landmark {
+  id      String    @id @default(cuid())
+  name    String
+  worldId String
+  world   World     @relation(fields: [worldId], references: [id])
+}
+
+model Celebration {
+  id      String    @id @default(cuid())
+  name    String
+  worldId String
+  world   World     @relation(fields: [worldId], references: [id])
+}
+
 model World {
   id                String     @id @default(cuid())
   name              String
-  chakra            Int
+  chakra            Int   @unique
   otherside         String
   description       String
   characteristics   String
   characters        Character[]
+  landmarks         Landmark[]
+  cities            City[]
+  characteristicsOfPeople  String
+  celebrations      Celebration[]
 }
 
 model Character {
   id                   String   @id @default(cuid())
   createdAt              DateTime            @default(now())
   updatedAt              DateTime            @updatedAt  @default(now())
-  preliminaryDescription  String
-  chakraDescription      String
+  preliminaryDescription  String?
+  chakraDescription      String?
   animalOrGodString      String?
   worldId                String
   world                  World    @relation(fields: [worldId], references: [id])
-  promptForMidjourney    String
-  characterName          String
-  characterBackstory     String
-  imageId                String?
-  imageUrl               String?
+  promptForMidjourney    String?
+  characterName          String?
+  characterBackstory     String?
+  imageId                String?  // Back from imagine api
   upscaledImageUrls      String[] // store as JSON string
   chosenImageUrl         String?
   readyToMint            Boolean  @default(false)
   completionResponse     String?
+  state                  CharacterState
+}
+
+enum CharacterState {
+  VOID                      // IDEA_IN_THE_NOOSPHERE
+  GERMINAL                  // STORY_GENERATED
+  EMBRYONIC                 // IMAGE_REQUESTED
+  FETAL                     // IMAGE_RECEIVED
+  BIRTHED                   // IMAGE_CHOSEN
 }
