@@ -10,8 +10,23 @@ const { v4: uuidv4 } = require('uuid');
 const prisma = require('./lib/prismaClient');
 const bodyParser = require('body-parser');
 // const genesis = require('./lib/genesis');
+const { genesisForChakra } = require('./lib/newGenesis');
 
 app.set('view engine', 'ejs');
+
+const runNewChakra = async () => {
+  console.log('Inside the run new chakra');
+  genesisForChakra(2);
+  for (let i = 3; i < 9; i++) {
+    setTimeout(() => {
+      console.log(
+        `Inside the set timeout. Now the genesis for the chakra number ${i} will start`
+      );
+      genesisForChakra(i);
+    }, i * 1800000);
+  }
+};
+runNewChakra();
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
