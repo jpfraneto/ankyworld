@@ -61,9 +61,6 @@ model Character {
   id                   String   @id @default(cuid())
   createdAt              DateTime            @default(now())
   updatedAt              DateTime            @updatedAt  @default(now())
-  preliminaryDescription  String?
-  chakraDescription      String?
-  animalOrGodString      String?
   worldId                String
   world                  World    @relation(fields: [worldId], references: [id])
   promptForMidjourney    String?
@@ -75,6 +72,8 @@ model Character {
   readyToMint            Boolean  @default(false)
   completionResponse     String?
   state                  CharacterState
+  traits                 Json?
+  worldCharacteristicsOfPeople  String?
 }
 
 enum CharacterState {
