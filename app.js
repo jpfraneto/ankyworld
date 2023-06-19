@@ -11,19 +11,9 @@ const FormData = require('form-data');
 const { v4: uuidv4 } = require('uuid');
 const prisma = require('./lib/prismaClient');
 const bodyParser = require('body-parser');
-// const { TwitterApi } = require('twitter-api-v2');
-
-// const genesis = require('./lib/genesis');
 const { genesisForChakra } = require('./lib/newGenesis');
 
 app.set('view engine', 'ejs');
-
-const client = new TwitterApi({
-  appKey: process.env.TWITTER_API_KEY,
-  appSecret: process.env.TWITTER_API_SECRET,
-  accessToken: process.env.TWITTER_ACCESS_TOKEN,
-  accessSecret: process.env.TWITTER_ACCESS_SECRET,
-});
 
 genesisForChakra(1);
 
