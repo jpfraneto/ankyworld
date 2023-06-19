@@ -16,6 +16,7 @@ const { genesisForChakra, bigbangEvent } = require('./lib/newGenesis');
 app.set('view engine', 'ejs');
 
 async function initializeBigBang() {
+  console.log('inside the initialize big bang function');
   const count = await prisma.character.count({
     where: {
       state: 'VOID',
@@ -25,6 +26,8 @@ async function initializeBigBang() {
   if (count === 8888) return;
   bigbangEvent();
 }
+
+initializeBigBang();
 
 // genesisForChakra(1);
 
