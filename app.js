@@ -15,7 +15,7 @@ const { genesisForChakra } = require('./lib/newGenesis');
 
 app.set('view engine', 'ejs');
 
-genesisForChakra(1);
+// genesisForChakra(1);
 
 // const runNewChakra = async () => {
 //   console.log('Inside the run new chakra');
@@ -30,6 +30,13 @@ genesisForChakra(1);
 //   }
 // };
 // runNewChakra();
+
+// async function getCharactersInformation() {
+//   const characters = await prisma.character.findMany({ where: { chakra: 1 } });
+//   console.log('the characters are: ', characters);
+// }
+
+// getCharactersInformation();
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
