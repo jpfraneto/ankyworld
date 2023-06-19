@@ -14,19 +14,19 @@ const { genesisForChakra } = require('./lib/newGenesis');
 
 app.set('view engine', 'ejs');
 
-const runNewChakra = async () => {
-  console.log('Inside the run new chakra');
-  genesisForChakra(2);
-  for (let i = 3; i < 9; i++) {
-    setTimeout(() => {
-      console.log(
-        `Inside the set timeout. Now the genesis for the chakra number ${i} will start`
-      );
-      genesisForChakra(i);
-    }, i * 1800000);
-  }
-};
-runNewChakra();
+// const runNewChakra = async () => {
+//   console.log('Inside the run new chakra');
+//   genesisForChakra(2);
+//   for (let i = 3; i < 9; i++) {
+//     setTimeout(() => {
+//       console.log(
+//         `Inside the set timeout. Now the genesis for the chakra number ${i} will start`
+//       );
+//       genesisForChakra(i);
+//     }, i * 1800000);
+//   }
+// };
+// runNewChakra();
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
@@ -52,6 +52,18 @@ app.get('/characters', async (req, res) => {
     console.error('Error getting characters:', error);
     res.status(500).send('Error getting characters');
   }
+});
+
+app.get('/api/characters', async (req, res) => {
+  const fetalCharacters = await prisma.character.findMany({
+    where: {
+      state: 'FETAL',
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+  });
+  res.json({ fetalCharacters });
 });
 
 app.get('/characters/ready', async (req, res) => {

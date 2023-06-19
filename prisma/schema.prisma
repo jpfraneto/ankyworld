@@ -82,4 +82,5 @@ enum CharacterState {
   EMBRYONIC                 // IMAGE_REQUESTED
   FETAL                     // IMAGE_RECEIVED
   BIRTHED                   // IMAGE_CHOSEN
+  FAILED                    // IMAGE_GENERATION_FAILED
 }
