@@ -6,32 +6,26 @@ const port = 3000;
 const axios = require('axios');
 const cron = require('node-cron');
 const async = require('async');
+const fs = require('fs');
+const FormData = require('form-data');
 const { v4: uuidv4 } = require('uuid');
 const prisma = require('./lib/prismaClient');
 const bodyParser = require('body-parser');
+// const { TwitterApi } = require('twitter-api-v2');
+
 // const genesis = require('./lib/genesis');
 const { genesisForChakra } = require('./lib/newGenesis');
 
 app.set('view engine', 'ejs');
 
-const duplicateCharacters = async () => {
-  const characters = await prisma.character.findMany();
+const client = new TwitterApi({
+  appKey: process.env.TWITTER_API_KEY,
+  appSecret: process.env.TWITTER_API_SECRET,
+  accessToken: process.env.TWITTER_ACCESS_TOKEN,
+  accessSecret: process.env.TWITTER_ACCESS_SECRET,
+});
 
-  // Create promises to insert characters into the testCharacter table
-  const insertPromises = characters.map(x => {
-    // Remove the id field from the character data
-    const { id, ...dataWithoutId } = x;
-
-    return prisma.testCharacter.create({
-      data: dataWithoutId,
-    });
-  });
-
-  // Wait for all promises to be settled
-  await Promise.all(insertPromises);
-};
-
-duplicateCharacters();
+genesisForChakra(1);
 
 // const runNewChakra = async () => {
 //   console.log('Inside the run new chakra');
@@ -54,6 +48,19 @@ app.use(express.static('public'));
 app.get('/', (req, res) => {
   res.send('Hello, welcome to the Anky NFTs server!');
 });
+
+// app.get('/tweet', async (req, res) => {
+//   const form = new FormData();
+//   form.append('media', fs.createReadStream('./aaaa.png'));
+
+//   const mediaUploadResponse = await client.v2.mediaUpload(form);
+//   const mediaId = mediaUploadResponse.media_id;
+//   const tweetText = 'Testing things out.';
+//   const tweetResponse = await client.v2.tweet(`${tweetText}`, {
+//     media_ids: mediaId,
+//   });
+//   console.log('Tweet sent:', tweetResponse);
+// });
 
 app.get('/characters', async (req, res) => {
   try {

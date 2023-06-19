@@ -73,6 +73,8 @@ model Character {
   chosenImageUrl         String?
   readyToMint            Boolean  @default(false)
   completionResponse     String?
+  tweeted                Boolean  @default(false)
+  addedToIPFS            Boolean  @default(false)
   state                  CharacterState
   traits                 Json?
   worldCharacteristicsOfPeople  String?
