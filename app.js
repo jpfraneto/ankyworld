@@ -14,10 +14,29 @@ const { genesisForChakra } = require('./lib/newGenesis');
 
 app.set('view engine', 'ejs');
 
+const duplicateCharacters = async () => {
+  const characters = await prisma.character.findMany();
+
+  // Create promises to insert characters into the testCharacter table
+  const insertPromises = characters.map(x => {
+    // Remove the id field from the character data
+    const { id, ...dataWithoutId } = x;
+
+    return prisma.testCharacter.create({
+      data: dataWithoutId,
+    });
+  });
+
+  // Wait for all promises to be settled
+  await Promise.all(insertPromises);
+};
+
+duplicateCharacters();
+
 // const runNewChakra = async () => {
 //   console.log('Inside the run new chakra');
-//   genesisForChakra(2);
-//   for (let i = 3; i < 9; i++) {
+//   genesisForChakra(1);
+//   for (let i = 2; i < 9; i++) {
 //     setTimeout(() => {
 //       console.log(
 //         `Inside the set timeout. Now the genesis for the chakra number ${i} will start`
@@ -55,7 +74,7 @@ app.get('/characters', async (req, res) => {
 });
 
 app.get('/api/characters', async (req, res) => {
-  const fetalCharacters = await prisma.character.findMany({
+  const fetalCharacters = await prisma.testCharacter.findMany({
     where: {
       state: 'FETAL',
     },

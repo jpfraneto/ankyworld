@@ -51,6 +51,7 @@ model World {
   description       String
   characteristics   String
   characters        Character[]
+  testCharacters    TestCharacter[]
   landmarks         Landmark[]
   cities            City[]
   characteristicsOfPeople  String
@@ -65,6 +66,27 @@ model Character {
   world                  World    @relation(fields: [worldId], references: [id])
   promptForMidjourney    String?
   characterName          String?
+  nftNumber              Int?
+  characterBackstory     String?
+  imageId                String?  // Back from imagine api
+  upscaledImageUrls      String[] // store as JSON string
+  chosenImageUrl         String?
+  readyToMint            Boolean  @default(false)
+  completionResponse     String?
+  state                  CharacterState
+  traits                 Json?
+  worldCharacteristicsOfPeople  String?
+}
+
+model TestCharacter {
+  id                   String   @id @default(cuid())
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt  @default(now())
+  worldId                String
+  world                  World    @relation(fields: [worldId], references: [id])
+  promptForMidjourney    String?
+  characterName          String?
+  nftNumber              Int?
   characterBackstory     String?
   imageId                String?  // Back from imagine api
   upscaledImageUrls      String[] // store as JSON string

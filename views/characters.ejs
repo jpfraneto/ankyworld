@@ -9,9 +9,6 @@
     <% characters.forEach((character)=> { %>
         <div class="main-character-container">
             <div class="images-container">
-                <h1>
-                    <%= character.characterName %>
-                </h1>
                 <div class="image-selector">
                     <% character.upscaledImageUrls.forEach((url)=> { %>
                         <img src="<%= url %>" onclick="selectImage('<%= character.id %>', '<%= url %>')"
@@ -20,23 +17,16 @@
                 </div>
             </div>
             <div class="text-container">
-                <input type="text" name="preliminaryDescription-<%= character.id %>"
-                    value="<%= character.preliminaryDescription %>">
-                <input type="text" name="chakraDescription-<%= character.id %>"
-                    value="<%= character.chakraDescription %>">
-                <input type="text" name="animalOrGodString-<%= character.id %>"
-                    value="<%= character.animalOrGodString %>">
-                <input type="text" name="promptForMidjourney-<%= character.id %>"
-                    value="<%= character.promptForMidjourney %>">
-                <input type="text" name="characterName-<%= character.id %>" value="<%= character.characterName %>">
-                <input type="text" name="characterBackstory-<%= character.id %>"
-                    value="<%= character.characterBackstory %>">
-                <input type="checkbox" name="readyToMint-<%= character.id %>" <%=character.readyToMint ? 'checked' : ''
-                    %>>
+                <h1>
+                    <%= character.characterName %>
+                </h1>
+                <p>
+                    <%= character.characterBackstory %>
+                </p>
+                <button onclick="updateCharacter('<%= character.id %>')">Update Character</button>
             </div>
         </div>
 
-        <button onclick="updateCharacter('<%= character.id %>')">Update Character</button>
         <% }); %>
             <script src="/script.js"></script>
 </body>
