@@ -11,7 +11,7 @@ const FormData = require('form-data');
 const { v4: uuidv4 } = require('uuid');
 const prisma = require('./lib/prismaClient');
 const bodyParser = require('body-parser');
-const { genesisForChakra, bigBangEvent } = require('./lib/newGenesis');
+const { genesisForChakra, bigbangEvent } = require('./lib/newGenesis');
 
 app.set('view engine', 'ejs');
 
@@ -19,7 +19,7 @@ async function initializeBigBang() {
   const count = await prisma.character.findMany({ where: { state: 'VOID' } });
   console.log(`there are ${count} characters in the void`);
   if (count === 8888) return;
-  bigBangEvent();
+  bigbangEvent();
 }
 
 // genesisForChakra(1);
