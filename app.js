@@ -48,8 +48,8 @@ async function getCharactersInformation() {
 // }
 
 // findBirthedCharacters();
-// genesisForChakra(2);
-getCharactersInformation();
+genesisForChakra(2);
+// getCharactersInformation();
 
 let pendingOnes = 0;
 
