@@ -11,7 +11,6 @@ const FormData = require('form-data');
 const { v4: uuidv4 } = require('uuid');
 const prisma = require('./lib/prismaClient');
 const bodyParser = require('body-parser');
-const { genesisForChakra, bigbangEvent } = require('./lib/newGenesis');
 const { initiateCharacterGenesisForChakra } = require('./lib/finalGenesis');
 
 app.set('view engine', 'ejs');
@@ -45,7 +44,7 @@ app.set('view engine', 'ejs');
 //   }
 // };
 // runNewChakra();
-initiateCharacterGenesisForChakra(1);
+initiateCharacterGenesisForChakra(2);
 
 async function getCharactersInformation() {
   const world = await prisma.world.findUnique({ where: { chakra: 1 } });
