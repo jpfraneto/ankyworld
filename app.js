@@ -12,6 +12,7 @@ const { v4: uuidv4 } = require('uuid');
 const prisma = require('./lib/prismaClient');
 const bodyParser = require('body-parser');
 const { genesisForChakra, bigbangEvent } = require('./lib/newGenesis');
+const { initiateCharacterGenesisForChakra } = require('./lib/finalGenesis');
 
 app.set('view engine', 'ejs');
 
@@ -29,7 +30,7 @@ app.set('view engine', 'ejs');
 
 // initializeBigBang();
 
-genesisForChakra(1);
+// genesisForChakra(1);
 
 // const runNewChakra = async () => {
 //   console.log('Inside the run new chakra');
@@ -44,13 +45,85 @@ genesisForChakra(1);
 //   }
 // };
 // runNewChakra();
+initiateCharacterGenesisForChakra(1);
 
-// async function getCharactersInformation() {
-//   const characters = await prisma.character.findMany({ where: { chakra: 1 } });
-//   console.log('the characters are: ', characters);
-// }
+async function getCharactersInformation() {
+  const world = await prisma.world.findUnique({ where: { chakra: 1 } });
+  const characters = await prisma.character.findMany({
+    where: { worldId: world.id },
+  });
+  const voidCharacters = characters.filter(x => x.state === 'VOID');
+  const embrionicCharacters = characters.filter(x => x.state === 'EMBRYONIC');
+  const germinalCharacters = characters.filter(x => x.state === 'GERMINAL');
+  const fetalCharacters = characters.filter(x => x.state === 'FETAL');
+  const birthedCharacters = characters.filter(x => x.state === 'BIRTHED');
+  const failedCharacters = characters.filter(x => x.state === 'FAILED');
+  console.log('void', voidCharacters.length);
+  console.log('embrionic', embrionicCharacters.length);
+  console.log('germinal', germinalCharacters.length);
+  console.log('fetal', fetalCharacters.length);
+  console.log('birthed', birthedCharacters.length);
+  console.log('failed', failedCharacters.length);
+}
 
 // getCharactersInformation();
+
+let pendingOnes = 0;
+
+// async function checkIfImageWasGenerated(imageId) {
+//   const config = {
+//     headers: { Authorization: `Bearer ${process.env.IMAGINE_API_KEY}` },
+//   };
+
+//   const response = await axios.get(
+//     `http://164.90.252.239:8055/items/images/${imageId}`,
+//     config
+//   );
+//   if (
+//     response.data.data.status !== 'pending' &&
+//     response.data.data.status !== 'in-progress'
+//   ) {
+//     console.log('Here goes one for updating.');
+//     return response.data.data;
+//   } else {
+//     pendingOnes++;
+//   }
+// }
+
+// async function updateEmbryonicCharacters() {
+//   console.log('in here');
+//   const world = await prisma.world.findUnique({ where: { chakra: 1 } });
+//   const characters = await prisma.character.findMany({
+//     where: { worldId: world.id },
+//   });
+//   const embryonicCharacters = characters.filter(x => x.state === 'EMBRYONIC');
+//   console.log(
+//     'doing this for all the embryonic characters, which are',
+//     embryonicCharacters.length
+//   );
+//   const updatePromises = embryonicCharacters.map(async character => {
+//     const image = await checkIfImageWasGenerated(character.imageId);
+//     if (image && image.upscaled_urls) {
+//       let updatedCharacter = await prisma.character.update({
+//         where: {
+//           id: character.id,
+//         },
+//         data: {
+//           upscaledImageUrls: image.upscaled_urls,
+//           state: 'FETAL',
+//         },
+//       });
+//       console.log('The character was updated and moved to the fetal state.');
+//     }
+//   });
+
+//   console.log('THe pending ones are: ', pendingOnes);
+
+//   // Use Promise.all to wait for all updates to complete.
+//   return Promise.all(updatePromises);
+// }
+
+//updateEmbryonicCharacters();
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
