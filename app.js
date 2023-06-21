@@ -11,14 +11,16 @@ const FormData = require('form-data');
 const { v4: uuidv4 } = require('uuid');
 const prisma = require('./lib/prismaClient');
 const bodyParser = require('body-parser');
+const { genesisForChakra } = require('./lib/newGenesis');
 const { initiateCharacterGenesisForChakra } = require('./lib/finalGenesis');
 
 app.set('view engine', 'ejs');
 
-initiateCharacterGenesisForChakra(2);
+// initiateCharacterGenesisForChakra(2);
 
 async function getCharactersInformation() {
-  const world = await prisma.world.findUnique({ where: { chakra: 1 } });
+  console.log('inside here');
+  const world = await prisma.world.findUnique({ where: { chakra: 2 } });
   const characters = await prisma.character.findMany({
     where: { worldId: world.id },
   });
@@ -36,17 +38,17 @@ async function getCharactersInformation() {
   console.log('failed', failedCharacters.length);
 }
 
-async function findBirthedCharacters() {
-  const world = await prisma.world.findUnique({ where: { chakra: 1 } });
-  const characters = await prisma.character.findMany({
-    where: { worldId: world.id, state: 'BIRTHED' },
-  });
+// async function findBirthedCharacters() {
+//   const world = await prisma.world.findUnique({ where: { chakra: 1 } });
+//   const characters = await prisma.character.findMany({
+//     where: { worldId: world.id, state: 'BIRTHED' },
+//   });
 
-  console.log('The birthed characters are: ', characters);
-}
+//   console.log('The birthed characters are: ', characters);
+// }
 
 // findBirthedCharacters();
-
+genesisForChakra(2);
 // getCharactersInformation();
 
 let pendingOnes = 0;
@@ -137,6 +139,7 @@ app.get('/characters', async (req, res) => {
       orderBy: {
         createdAt: 'asc',
       },
+      take: 20,
     });
     res.render('characters', { characters });
   } catch (error) {
@@ -148,11 +151,13 @@ app.get('/characters', async (req, res) => {
 app.get('/api/characters', async (req, res) => {
   const fetalCharacters = await prisma.testCharacter.findMany({
     where: {
+      readyToMint: false,
       state: 'FETAL',
     },
     orderBy: {
       createdAt: 'asc',
     },
+    take: 20,
   });
   res.json({ fetalCharacters });
 });
@@ -177,7 +182,7 @@ app.get('/characters/ready', async (req, res) => {
   }
 });
 
-app.put('/characters/:id', async (req, res) => {
+app.put('/api/characters/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { chosenImageUrl, readyToMint } = req.body;

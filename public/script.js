@@ -16,7 +16,7 @@ async function updateCharacter(characterId) {
     return;
   }
 
-  const response = await fetch(`/characters/${characterId}`, {
+  const response = await fetch(`/api/characters/${characterId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
