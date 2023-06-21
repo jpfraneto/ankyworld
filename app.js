@@ -15,35 +15,6 @@ const { initiateCharacterGenesisForChakra } = require('./lib/finalGenesis');
 
 app.set('view engine', 'ejs');
 
-// async function initializeBigBang() {
-//   console.log('inside the initialize big bang function');
-//   const count = await prisma.character.count({
-//     where: {
-//       state: 'VOID',
-//     },
-//   });
-//   console.log(`there are ${count} characters in the void`);
-//   if (count === 8888) return;
-//   bigbangEvent();
-// }
-
-// initializeBigBang();
-
-// genesisForChakra(1);
-
-// const runNewChakra = async () => {
-//   console.log('Inside the run new chakra');
-//   genesisForChakra(1);
-//   for (let i = 2; i < 9; i++) {
-//     setTimeout(() => {
-//       console.log(
-//         `Inside the set timeout. Now the genesis for the chakra number ${i} will start`
-//       );
-//       genesisForChakra(i);
-//     }, i * 1800000);
-//   }
-// };
-// runNewChakra();
 initiateCharacterGenesisForChakra(2);
 
 async function getCharactersInformation() {
@@ -64,6 +35,17 @@ async function getCharactersInformation() {
   console.log('birthed', birthedCharacters.length);
   console.log('failed', failedCharacters.length);
 }
+
+async function findBirthedCharacters() {
+  const world = await prisma.world.findUnique({ where: { chakra: 1 } });
+  const characters = await prisma.character.findMany({
+    where: { worldId: world.id, state: 'BIRTHED' },
+  });
+
+  console.log('The birthed characters are: ', characters);
+}
+
+// findBirthedCharacters();
 
 // getCharactersInformation();
 
