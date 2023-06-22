@@ -19,7 +19,7 @@ app.set('view engine', 'ejs');
 // initiateCharacterGenesisForChakra(2);
 
 async function getCharactersInformation() {
-  console.log('inside here');
+  console.log('inside the getCharactersInformation function');
   const world = await prisma.world.findUnique({ where: { chakra: 2 } });
   const characters = await prisma.character.findMany({
     where: { worldId: world.id },
@@ -37,6 +37,7 @@ async function getCharactersInformation() {
   console.log('birthed', birthedCharacters.length);
   console.log('failed', failedCharacters.length);
 }
+// getCharactersInformation();
 
 // async function findBirthedCharacters() {
 //   const world = await prisma.world.findUnique({ where: { chakra: 1 } });
