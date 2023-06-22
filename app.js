@@ -131,6 +131,13 @@ app.get('/', (req, res) => {
 
 app.get('/characters', async (req, res) => {
   try {
+    const characterCount = await prisma.character.count({
+      where: {
+        readyToMint: false,
+        state: 'FETAL',
+      },
+    });
+    console.log('The character count is: ', characterCount);
     const characters = await prisma.character.findMany({
       where: {
         readyToMint: false,
