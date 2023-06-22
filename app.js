@@ -16,11 +16,9 @@ const { initiateCharacterGenesisForChakra } = require('./lib/finalGenesis');
 
 app.set('view engine', 'ejs');
 
-// initiateCharacterGenesisForChakra(2);
-
 async function getCharactersInformation() {
   console.log('inside the getCharactersInformation function');
-  const world = await prisma.world.findUnique({ where: { chakra: 1 } });
+  const world = await prisma.world.findUnique({ where: { chakra: 2 } });
   const characters = await prisma.character.findMany({
     where: { worldId: world.id },
   });
@@ -37,7 +35,11 @@ async function getCharactersInformation() {
   console.log('birthed', birthedCharacters.length);
   console.log('failed', failedCharacters.length);
 }
+// initiateCharacterGenesisForChakra(2);
 // getCharactersInformation();
+// findBirthedCharacters();
+genesisForChakra(3);
+// updateEmbryonicCharacters();
 
 // async function findBirthedCharacters() {
 //   const world = await prisma.world.findUnique({ where: { chakra: 1 } });
@@ -48,65 +50,61 @@ async function getCharactersInformation() {
 //   console.log('The birthed characters are: ', characters);
 // }
 
-// findBirthedCharacters();
-genesisForChakra(2);
+let processingCharacters = 0;
 
-let pendingOnes = 0;
+async function checkIfImageWasGenerated(imageId) {
+  const config = {
+    headers: { Authorization: `Bearer ${process.env.IMAGINE_API_KEY}` },
+  };
 
-// async function checkIfImageWasGenerated(imageId) {
-//   const config = {
-//     headers: { Authorization: `Bearer ${process.env.IMAGINE_API_KEY}` },
-//   };
+  const response = await axios.get(
+    `http://164.90.252.239:8055/items/images/${imageId}`,
+    config
+  );
+  if (
+    response.data.data.status !== 'pending' &&
+    response.data.data.status !== 'in-progress'
+  ) {
+    console.log('Here goes one for updating.');
+    return response.data.data;
+  } else {
+  }
+}
 
-//   const response = await axios.get(
-//     `http://164.90.252.239:8055/items/images/${imageId}`,
-//     config
-//   );
-//   if (
-//     response.data.data.status !== 'pending' &&
-//     response.data.data.status !== 'in-progress'
-//   ) {
-//     console.log('Here goes one for updating.');
-//     return response.data.data;
-//   } else {
-//     pendingOnes++;
-//   }
-// }
+async function updateEmbryonicCharacters() {
+  console.log('in here');
+  const world = await prisma.world.findUnique({ where: { chakra: 2 } });
+  const characters = await prisma.character.findMany({
+    where: { worldId: world.id },
+  });
+  const embryonicCharacters = characters.filter(x => x.state === 'EMBRYONIC');
+  console.log(
+    'doing this for all the embryonic characters, which are',
+    embryonicCharacters.length
+  );
+  const updatePromises = embryonicCharacters.map(async character => {
+    const image = await checkIfImageWasGenerated(character.imageId);
 
-// async function updateEmbryonicCharacters() {
-//   console.log('in here');
-//   const world = await prisma.world.findUnique({ where: { chakra: 1 } });
-//   const characters = await prisma.character.findMany({
-//     where: { worldId: world.id },
-//   });
-//   const embryonicCharacters = characters.filter(x => x.state === 'EMBRYONIC');
-//   console.log(
-//     'doing this for all the embryonic characters, which are',
-//     embryonicCharacters.length
-//   );
-//   const updatePromises = embryonicCharacters.map(async character => {
-//     const image = await checkIfImageWasGenerated(character.imageId);
-//     if (image && image.upscaled_urls) {
-//       let updatedCharacter = await prisma.character.update({
-//         where: {
-//           id: character.id,
-//         },
-//         data: {
-//           upscaledImageUrls: image.upscaled_urls,
-//           state: 'FETAL',
-//         },
-//       });
-//       console.log('The character was updated and moved to the fetal state.');
-//     }
-//   });
+    if (image && image.upscaled_urls) {
+      let updatedCharacter = await prisma.character.update({
+        where: {
+          id: character.id,
+        },
+        data: {
+          upscaledImageUrls: image.upscaled_urls,
+          state: 'FETAL',
+        },
+      });
+      processingCharacters--;
+      console.log(
+        `The character ${character.id} was updated and moved to the fetal state.`
+      );
+    }
+  });
 
-//   console.log('THe pending ones are: ', pendingOnes);
-
-//   // Use Promise.all to wait for all updates to complete.
-//   return Promise.all(updatePromises);
-// }
-
-//updateEmbryonicCharacters();
+  // Use Promise.all to wait for all updates to complete.
+  return Promise.all(updatePromises);
+}
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
