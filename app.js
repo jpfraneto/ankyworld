@@ -20,7 +20,7 @@ app.set('view engine', 'ejs');
 
 async function getCharactersInformation() {
   console.log('inside the getCharactersInformation function');
-  const world = await prisma.world.findUnique({ where: { chakra: 2 } });
+  const world = await prisma.world.findUnique({ where: { chakra: 1 } });
   const characters = await prisma.character.findMany({
     where: { worldId: world.id },
   });
@@ -31,8 +31,8 @@ async function getCharactersInformation() {
   const birthedCharacters = characters.filter(x => x.state === 'BIRTHED');
   const failedCharacters = characters.filter(x => x.state === 'FAILED');
   console.log('void', voidCharacters.length);
-  console.log('embrionic', embrionicCharacters.length);
   console.log('germinal', germinalCharacters.length);
+  console.log('embrionic', embrionicCharacters.length);
   console.log('fetal', fetalCharacters.length);
   console.log('birthed', birthedCharacters.length);
   console.log('failed', failedCharacters.length);
@@ -50,7 +50,6 @@ async function getCharactersInformation() {
 
 // findBirthedCharacters();
 genesisForChakra(2);
-// getCharactersInformation();
 
 let pendingOnes = 0;
 
