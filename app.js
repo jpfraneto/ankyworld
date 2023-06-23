@@ -11,14 +11,21 @@ const FormData = require('form-data');
 const { v4: uuidv4 } = require('uuid');
 const prisma = require('./lib/prismaClient');
 const bodyParser = require('body-parser');
-const { genesisForChakra } = require('./lib/newGenesis');
+const {
+  genesisForChakra,
+  newRequestCharacterImage,
+} = require('./lib/newGenesis');
 const { initiateCharacterGenesisForChakra } = require('./lib/finalGenesis');
 
 app.set('view engine', 'ejs');
 
+const WORKING_CHAKRA = 3;
+
 async function getCharactersInformation() {
   console.log('inside the getCharactersInformation function');
-  const world = await prisma.world.findUnique({ where: { chakra: 2 } });
+  const world = await prisma.world.findUnique({
+    where: { chakra: WORKING_CHAKRA },
+  });
   const characters = await prisma.character.findMany({
     where: { worldId: world.id },
   });
@@ -35,14 +42,16 @@ async function getCharactersInformation() {
   console.log('birthed', birthedCharacters.length);
   console.log('failed', failedCharacters.length);
 }
-// initiateCharacterGenesisForChakra(2);
+
+// initiateCharacterGenesisForChakra(WORKING_CHAKRA);
 // getCharactersInformation();
 // findBirthedCharacters();
-genesisForChakra(3);
+genesisForChakra(WORKING_CHAKRA);
 // updateEmbryonicCharacters();
+// updateFailedCharacters();
 
 // async function findBirthedCharacters() {
-//   const world = await prisma.world.findUnique({ where: { chakra: 1 } });
+//   const world = await prisma.world.findUnique({ where: { chakra: WORKING_CHAKRA } });
 //   const characters = await prisma.character.findMany({
 //     where: { worldId: world.id, state: 'BIRTHED' },
 //   });
@@ -61,32 +70,61 @@ async function checkIfImageWasGenerated(imageId) {
     `http://164.90.252.239:8055/items/images/${imageId}`,
     config
   );
-  if (
-    response.data.data.status !== 'pending' &&
-    response.data.data.status !== 'in-progress'
-  ) {
-    console.log('Here goes one for updating.');
-    return response.data.data;
-  } else {
-  }
+  return response.data.data;
+}
+
+async function updateFailedCharacters() {
+  const world = await prisma.world.findUnique({
+    where: { chakra: WORKING_CHAKRA },
+  });
+  const failedCharacters = await prisma.character.findMany({
+    where: { worldId: world.id, state: 'FAILED' },
+  });
+  const updateFailedPromises = failedCharacters.map(async character => {
+    // await newRequestCharacterImage(character);
+    updatedCharacter = await prisma.character.update({
+      where: {
+        id: character.id,
+      },
+      data: {
+        state: 'GERMINAL',
+      },
+    });
+    console.log("The character's status is now germinal");
+  });
+
+  // Use Promise.all to wait for all updates to complete.
+  return Promise.all(updateFailedPromises);
 }
 
 async function updateEmbryonicCharacters() {
-  console.log('in here');
-  const world = await prisma.world.findUnique({ where: { chakra: 2 } });
-  const characters = await prisma.character.findMany({
-    where: { worldId: world.id },
+  const world = await prisma.world.findUnique({
+    where: { chakra: WORKING_CHAKRA },
   });
-  const embryonicCharacters = characters.filter(x => x.state === 'EMBRYONIC');
-  console.log(
-    'doing this for all the embryonic characters, which are',
-    embryonicCharacters.length
-  );
-  const updatePromises = embryonicCharacters.map(async character => {
-    const image = await checkIfImageWasGenerated(character.imageId);
+  const embryonicCharacters = await prisma.character.findMany({
+    where: { worldId: world.id, state: 'EMBRYONIC' },
+  });
 
-    if (image && image.upscaled_urls) {
-      let updatedCharacter = await prisma.character.update({
+  const updatePromises = embryonicCharacters.map(async character => {
+    console.log('the character image id is: ', character.imageId);
+    const image = await checkIfImageWasGenerated(character.imageId);
+    console.log('the image reposnse is: ', image);
+    let updatedCharacter;
+    if (image.status === 'failed') {
+      updatedCharacter = await prisma.character.update({
+        where: {
+          id: character.id,
+        },
+        data: {
+          state: 'FAILED',
+        },
+      });
+      console.log(
+        `The character ${character.id} was updated and moved to the failed state.`
+      );
+    }
+    if (image.status === 'completed') {
+      updatedCharacter = await prisma.character.update({
         where: {
           id: character.id,
         },
@@ -95,7 +133,6 @@ async function updateEmbryonicCharacters() {
           state: 'FETAL',
         },
       });
-      processingCharacters--;
       console.log(
         `The character ${character.id} was updated and moved to the fetal state.`
       );
@@ -104,6 +141,10 @@ async function updateEmbryonicCharacters() {
 
   // Use Promise.all to wait for all updates to complete.
   return Promise.all(updatePromises);
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 app.use(bodyParser.json()); // support json encoded bodies
