@@ -19,10 +19,13 @@ const { initiateCharacterGenesisForChakra } = require('./lib/finalGenesis');
 
 app.set('view engine', 'ejs');
 
-const WORKING_CHAKRA = 3;
+const WORKING_CHAKRA = 4;
 
 async function getCharactersInformation() {
-  console.log('inside the getCharactersInformation function');
+  console.log(
+    'inside the getCharactersInformation function for the chakra number ',
+    WORKING_CHAKRA
+  );
   const world = await prisma.world.findUnique({
     where: { chakra: WORKING_CHAKRA },
   });
@@ -46,7 +49,8 @@ async function getCharactersInformation() {
 // initiateCharacterGenesisForChakra(WORKING_CHAKRA);
 // getCharactersInformation();
 // findBirthedCharacters();
-genesisForChakra(WORKING_CHAKRA);
+genesisForChakra(4);
+// updateGerminalCharacters();
 // updateEmbryonicCharacters();
 // updateFailedCharacters();
 
@@ -71,6 +75,31 @@ async function checkIfImageWasGenerated(imageId) {
     config
   );
   return response.data.data;
+}
+
+async function updateGerminalCharacters() {
+  const world = await prisma.world.findUnique({
+    where: { chakra: WORKING_CHAKRA },
+  });
+  const germinalCharacters = await prisma.character.findMany({
+    where: { worldId: world.id, state: 'GERMINAL' },
+  });
+  const updateFailedPromises = germinalCharacters.map(async character => {
+    console.log('the character is: ', character);
+    await newRequestCharacterImage(character);
+    // updatedCharacter = await prisma.character.update({
+    //   where: {
+    //     id: character.id,
+    //   },
+    //   data: {
+    //     state: 'GERMINAL',
+    //   },
+    // });
+    console.log("The character's status is now embryonic");
+  });
+
+  // Use Promise.all to wait for all updates to complete.
+  return Promise.all(updateFailedPromises);
 }
 
 async function updateFailedCharacters() {
@@ -170,10 +199,14 @@ app.get('/', (req, res) => {
 
 app.get('/characters', async (req, res) => {
   try {
+    const world = await prisma.world.findUnique({
+      where: { chakra: WORKING_CHAKRA },
+    });
     const characterCount = await prisma.character.count({
       where: {
         readyToMint: false,
         state: 'FETAL',
+        worldId: world.id,
       },
     });
     console.log('The character count is: ', characterCount);
@@ -181,6 +214,7 @@ app.get('/characters', async (req, res) => {
       where: {
         readyToMint: false,
         state: 'FETAL',
+        worldId: world.id,
       },
       orderBy: {
         createdAt: 'asc',
